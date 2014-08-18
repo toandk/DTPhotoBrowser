@@ -66,7 +66,7 @@
         [self addTableTapGesture];
         [self hideToolBar:NO];
         
-        [self setupBackgroundImage];
+        [self setupBackgroundWithImage:senderImg];
         [self presentAnimation];
         
         firstInit = NO;
@@ -118,12 +118,12 @@
 }
 
 
--(void)setupBackgroundImage {
+-(void)setupBackgroundWithImage:(UIImageView*)imgView {
     UIViewController *rootViewController = [[[[UIApplication sharedApplication] delegate] window] rootViewController];
     
-    senderImg.hidden = YES;
+    imgView.hidden = YES;
     UIImage *screenShot = [[self class] captureScreenOfView:rootViewController.view];
-    senderImg.hidden = NO;
+    imgView.hidden = NO;
     backgroundImg.image = screenShot;
 }
 
@@ -282,10 +282,19 @@
 
 - (void) scrollViewDidEndDecelerating:(UIScrollView *)scrollView {
     int pageIndex = [self getCurrentIndex];
-    pageLabel.text = [NSString stringWithFormat:@"%d/%d", pageIndex, photoUrls.count];
+    pageLabel.text = [NSString stringWithFormat:@"%d/%d", pageIndex + 1, photoUrls.count];
     
     if (pageIndex != self.currentIndex) {
         self.currentIndex = pageIndex;
+        if (self.delegate && [self.delegate respondsToSelector:@selector(browser:didScrollToIndex:)]) {
+            [self.delegate browser:self didScrollToIndex:pageIndex];
+            if ([self.delegate respondsToSelector:@selector(senderImageViewAtIndex:willScrollToImage:)]) {
+                UIImageView *imgView = [self.delegate senderImageViewAtIndex:pageIndex willScrollToImage:NO];
+                if (imgView) {
+                    [self setupBackgroundWithImage:imgView];
+                }
+            }
+        }
     }
 }
 
@@ -293,11 +302,17 @@
 -(IBAction)doneAction:(id)sender {
     [self hideToolBar:NO];
     UIViewController *rootViewController = [[[[UIApplication sharedApplication] delegate] window] rootViewController];
-    CGPoint pointInWindow = [senderImg convertPoint:senderImg.bounds.origin toView:rootViewController.view];
+    UIImageView *senderImageView = senderImg;
+    if (self.delegate && [self.delegate respondsToSelector:@selector(senderImageViewAtIndex:willScrollToImage:)])
+        senderImageView = [self.delegate senderImageViewAtIndex:[self getCurrentIndex] willScrollToImage:NO];
+    CGPoint point = [senderImageView convertPoint:senderImageView.bounds.origin toView:rootViewController.view];
+    CGRect senderRect = CGRectMake(point.x, point.y, senderImageView.frame.size.width, senderImageView.frame.size.height);
+    [self setupBackgroundWithImage:senderImageView];
+    
     DTPhotoCell *currentCell = [self getCurrentCell];
     [UIView animateWithDuration:0.5 animations:^{
         blackMaskImg.alpha = 0.0;
-        currentCell.photoImg.frame = CGRectMake(pointInWindow.x, pointInWindow.y, senderImg.frame.size.width, senderImg.frame.size.height);
+        currentCell.photoImg.frame = senderRect;
     } completion:^(BOOL finished) {
         senderImg = nil;
         [self dismissViewControllerAnimated:NO completion:^{

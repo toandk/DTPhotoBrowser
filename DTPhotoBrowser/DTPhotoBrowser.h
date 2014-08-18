@@ -15,7 +15,13 @@ typedef enum {
     BarAnimationStateAnimating,
 } BarAnimationState;
 
+@class DTPhotoBrowser;
+
 @protocol DTPhotoBrowserDelegate <NSObject>
+
+@optional
+-(UIImageView*)senderImageViewAtIndex:(int)index willScrollToImage:(BOOL)willScroll;
+-(void)browser:(DTPhotoBrowser*)browser didScrollToIndex:(int)index;
 
 @end
 

@@ -7,10 +7,12 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "DTPhotoBrowser.h"
 
 @interface DTPhotoTapGestureRecognizer : UITapGestureRecognizer
 
 @property (nonatomic, strong) NSArray *listPhotos;
 @property (nonatomic, assign) int initialIndex;
+@property (nonatomic, weak) id<DTPhotoBrowserDelegate> browserDelegate;
 
 @end

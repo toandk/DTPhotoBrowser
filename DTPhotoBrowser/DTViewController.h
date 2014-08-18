@@ -10,6 +10,7 @@
 
 @interface DTViewController : UIViewController <UITableViewDataSource, UITableViewDelegate> {
     NSArray *_samplePictures;
+    __weak IBOutlet UITableView *_tableView;
 }
 
 @end

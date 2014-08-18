@@ -7,22 +7,24 @@
 //
 
 #import "UIImageView+DTPhotoBrowser.h"
-#import "DTPhotoBrowser.h"
+
 #import "DTPhotoTapGestureRecognizer.h"
 
 @implementation UIImageView (DTPhotoBrowser)
 
--(void)setupDTPhotoBrowserWithIndex:(int)index withPhotoUrls:(NSArray*)photoUrls {
+-(void)setupDTPhotoBrowserWithIndex:(int)index withPhotoUrls:(NSArray*)photoUrls withDelegate:(id<DTPhotoBrowserDelegate>)delegate {
     self.userInteractionEnabled = YES;
     DTPhotoTapGestureRecognizer *gesture = [[DTPhotoTapGestureRecognizer alloc] initWithTarget:self action:@selector(showDTPhotoBrowser:)];
     gesture.cancelsTouchesInView = NO;
+    gesture.browserDelegate = delegate;
     gesture.listPhotos = photoUrls;
     gesture.initialIndex = index;
     [self addGestureRecognizer:gesture];
 }
 
 -(void)showDTPhotoBrowser:(DTPhotoTapGestureRecognizer*)gesture {
-    [DTPhotoBrowser showWithPhotoUrls:gesture.listPhotos withInitialIndex:gesture.initialIndex withSender:self];
+    DTPhotoBrowser *browser = [DTPhotoBrowser showWithPhotoUrls:gesture.listPhotos withInitialIndex:gesture.initialIndex withSender:self];
+    browser.delegate = gesture.browserDelegate;
 }
 
 @end

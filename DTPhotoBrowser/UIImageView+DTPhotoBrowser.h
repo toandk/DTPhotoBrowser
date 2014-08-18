@@ -7,9 +7,10 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "DTPhotoBrowser.h"
 
 @interface UIImageView (DTPhotoBrowser)
 
--(void)setupDTPhotoBrowserWithIndex:(int)index withPhotoUrls:(NSArray*)photoUrls;
+-(void)setupDTPhotoBrowserWithIndex:(int)index withPhotoUrls:(NSArray*)photoUrls withDelegate:(id<DTPhotoBrowserDelegate>)delegate;
 
 @end

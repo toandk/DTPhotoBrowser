@@ -16,7 +16,7 @@
 #define SAMPLE_IMAGE_3			[UIImage imageNamed:@"sample3.jpg"]
 #define SAMPLE_IMAGE_4			[UIImage imageNamed:@"sample4.jpg"]
 
-@interface DTViewController ()
+@interface DTViewController ()<DTPhotoBrowserDelegate>
 
 @end
 
@@ -81,7 +81,8 @@
 		[cell.contentView addSubview:imageView];
 	}
     [imageView setImageWithURL:[NSURL URLWithString:_samplePictures[indexPath.row]] placeholderImage:nil];
-    [imageView setupDTPhotoBrowserWithIndex:indexPath.row withPhotoUrls:_samplePictures];
+    [imageView setupDTPhotoBrowserWithIndex:indexPath.row withPhotoUrls:_samplePictures withDelegate:self];
+    
 	
 	UILabel *titleLabel = (UILabel *)[cell.contentView viewWithTag:2];
 	if (!titleLabel) {
@@ -91,6 +92,22 @@
 		
 		[cell.contentView addSubview:titleLabel];
 	}
+}
+
+#pragma mark DTPhotoBrowser delegate
+-(UIImageView*)senderImageViewAtIndex:(int)index willScrollToImage:(BOOL)willScroll {
+    NSIndexPath *indexPath = [NSIndexPath indexPathForRow:index inSection:0];
+    if (willScroll) {
+        [_tableView scrollToRowAtIndexPath:indexPath atScrollPosition:UITableViewScrollPositionMiddle animated:NO];
+    }
+    UITableViewCell *cell = [_tableView cellForRowAtIndexPath:indexPath];
+    UIImageView *imgView = (UIImageView *)[cell.contentView viewWithTag:1];
+    return imgView;
+}
+
+-(void)browser:(DTPhotoBrowser *)browser didScrollToIndex:(int)index {
+    NSIndexPath *indexPath = [NSIndexPath indexPathForRow:index inSection:0];
+    [_tableView scrollToRowAtIndexPath:indexPath atScrollPosition:UITableViewScrollPositionMiddle animated:NO];
 }
 
 @end
